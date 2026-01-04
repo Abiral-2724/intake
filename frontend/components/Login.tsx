@@ -16,12 +16,26 @@ export default function LoginPage() {
     <div className="min-h-screen flex font-sans">
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: "#3F3FF3" }}>
         <div className="relative z-10 flex flex-col justify-between w-full px-12 py-12">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
-              <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: "#3F3FF3" }}></div>
-            </div>
-            <h1 className="text-xl font-semibold text-white">Frello</h1>
-          </div>
+        <div className="flex items-center">
+  
+  <h1 className="text-xl font-semibold text-white flex items-start">
+    <svg xmlns="http://www.w3.org/2000/svg" width="170" height="50" viewBox="0 0 600 160">
+      <text x="40" y="110"
+            fill="#000000"
+            font-size="104"
+            font-weight="700"
+            letter-spacing="-4"
+            font-family="Arial, Helvetica, sans-serif">
+        intake
+      </text>
+    </svg>
+    <img 
+      src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg" 
+      alt="" 
+      className="w-2.5 h-2.5 mt-3 ml-[-78px]"
+    />
+  </h1>
+</div>
 
           <div className="flex-1 flex flex-col justify-center">
             <h2 className="text-4xl text-white mb-6 leading-tight">Effortlessly manage your team and operations.</h2>
@@ -31,7 +45,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-between items-center text-white/70 text-sm">
-            <span>Copyright © 2025 Frello Enterprises LTD.</span>
+            <span>Copyright © 2025 intake.com</span>
             <span className="cursor-pointer hover:text-white/90">Privacy Policy</span>
           </div>
         </div>
@@ -39,15 +53,26 @@ export default function LoginPage() {
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
-          <div className="lg:hidden text-center mb-8">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-3"
-              style={{ backgroundColor: "#3F3FF3" }}
-            >
-              <div className="w-4 h-4 bg-white rounded-sm"></div>
-            </div>
-            <h1 className="text-xl font-semibold text-foreground">Frello</h1>
-          </div>
+        <div className="flex items-center ml-25">
+  
+  <h1 className="text-xl font-semibold text-white flex items-start">
+    <svg xmlns="http://www.w3.org/2000/svg" width="170" height="50" viewBox="0 0 600 160">
+      <text x="40" y="110"
+            fill="#000000"
+            font-size="104"
+            font-weight="700"
+            letter-spacing="-4"
+            font-family="Arial, Helvetica, sans-serif">
+        intake
+      </text>
+    </svg>
+    <img 
+      src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg" 
+      alt="" 
+      className="w-2.5 h-2.5 mt-3 ml-[-78px]"
+    />
+  </h1>
+</div>
 
           <div className="space-y-6">
             <div className="space-y-2 text-center">

@@ -69,8 +69,8 @@ const defaultSections: FooterSection[] = [
 ]
 
 export const Footer = ({
-  companyName = "FormStream",
-  tagline = "The Intelligence Layer for Modern Communication",
+  companyName = "intake.com",
+  tagline = "A smarter way to ask",
   sections = defaultSections,
   socialLinks = {
     twitter: "https://twitter.com",

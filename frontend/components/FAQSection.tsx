@@ -13,19 +13,19 @@ type FAQSectionProps = {
 }
 const defaultFAQs: FAQItem[] = [
   {
-    question: "What is Auralink and how does it work?",
+    question: "Is Intake really free?",
     answer:
-      "Auralink is an AI-powered intelligence layer that connects all your communication tools—calls, chats, and meetings—into a unified system. It analyzes conversations in real-time to provide insights on sentiment, tone, team alignment, and collaboration patterns. Simply integrate Auralink with your existing tools like Slack, Zoom, or Microsoft Teams, and start gaining actionable insights immediately.",
+     "Yes! Born out of frustration with expensive form builders, Tally offers unlimited forms and submissions for free within our fair use guidelines. You can get started right away and create forms using advanced features like conditional logic, signatures, calculations, file uploads, and many more — all for free and without time restrictions.",
   },
   {
-    question: "How does Auralink use my data to build a custom AI chat?",
+    question: "How does Intake compare to other form builders?",
     answer:
-      "Auralink processes your communication data using advanced natural language processing and machine learning models. All data is encrypted end-to-end and processed in compliance with enterprise-grade security standards. Your data is never shared with third parties, and you maintain complete control over what gets analyzed. The AI learns from patterns in your team's communication to provide personalized insights specific to your organization.",
+      "Unlike most form builders that limit submissions or restrict advanced features to premium plans, Tally offers unlimited forms and submissions for free. Our intuitive interface and powerful features like conditional logic, signatures, and password protection are available without paywalls. For detailed comparisons with specific form builders like Typeform, Jotform, Paperform, and others, take a look at out our comparison guides.",
   },
   {
-    question: "How do I get started with Auralink and what are the pricing options?",
+    question: "How can I get started?",
     answer:
-      "Getting started is simple: sign up for a free trial, connect your communication tools, and start analyzing within minutes. We offer flexible pricing tiers: Starter (free for small teams), Professional ($29/user/month), and Enterprise (custom pricing with dedicated support). All plans include core features like sentiment analysis and real-time insights. Contact our sales team for volume discounts and custom enterprise solutions.",
+      "You can start creating your first form right away—no sign up needed! Create your first form here or head over to our signup page to create your account. For tips and best practices, check out our Get started guide.",
   },
 ]
 export const FAQSection = ({ title = "Frequently asked questions", faqs = defaultFAQs }: FAQSectionProps) => {
