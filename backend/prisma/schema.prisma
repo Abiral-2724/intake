@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // engineType = "binary" 
+}
+
+datasource db {
+  provider = "postgresql" 
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user 
+  admin
+}
+
+enum typeWork {
+Student
+Educator
+Product
+Engineering
+Design
+Sales
+Marketing
+CustomerService
+BusinessAdministration
+Operations
+HumanResources
+IT
+Finance
+ArtsAndEntertainment
+HealthAndMedicine
+SocialImpact
+LawAndPublicPolicy
+Government
+Other
+}
+
+enum whereDiscover {
+RecommendationFromfriend
+RecommendationFromCoWorker
+RecommendationFromCommunity
+XorTwitter
+TikTok
+Reddit
+IndieHackers
+LinkedIn
+YouTube
+Instagram
+Onlinesearch
+Newsletter
+Facebook
+ProductHunt
+Blogpost
+Podcast
+AI
+Other
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum Plan {
+  Free
+  Pro
+  Business
+}
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique
+  firstName String?
+  lastName String?
+  gender Gender?
+  profile String @default("https://plus.unsplash.com/premium_vector-1682269287900-d96e9a6c188b?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+  role Role @default(user)
+  subscriptionPlan Plan @default(Free)
+  typeOfWorkYouDo typeWork @default(Other)
+  yourRole String? 
+  whereYouDiscoverIntake whereDiscover @default(Other)
+  createdAt   DateTime @default(now())
+
+  featureRequested featureRequest[]
+  upvotes FeatureUpvote[]
+  @@map("users")
+}
+
+model featureRequest {
+  id String @id @default(uuid()) @db.Uuid
+  ownerId String @db.Uuid
+  user User @relation(fields: [ownerId] ,references:[id] ,onDelete: Cascade)
+  title String?
+  description String
+  likes Int @default(0)
+  underReview Boolean @default(false)
+  files filesFeatureRequest[]
+  upvotes FeatureUpvote[]
+createdAt   DateTime @default(now())
+}
+
+model filesFeatureRequest {
+  id String @id @default(uuid()) @db.Uuid
+  featureId String @db.Uuid
+  feature featureRequest @relation(fields: [featureId] ,references: [id] ,onDelete: Cascade)
+  imageUrl String
+  createdAt   DateTime @default(now())
+}
+
+model FeatureUpvote {
+  id        String   @id @default(uuid()) @db.Uuid
+  featureId String   @db.Uuid
+  userId    String   @db.Uuid
+  feature featureRequest @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([featureId, userId])
+}
