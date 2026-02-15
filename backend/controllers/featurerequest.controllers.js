@@ -279,6 +279,49 @@ export const downvoteFeatureRequest = async(req ,res) => {
     }
 }
 
+export const getallUpvotesofUser = async(req ,res) => {
+  try{
+    const userId = req.params.userId; 
+
+      if(!userId){
+        return res.status(400).json({
+            success : false ,
+            message : "userId missing!"
+        })
+    }
+
+    const doesUserExits = await client.user.findFirst({
+        where : {
+            id : userId
+        }
+    })
+
+    if(!doesUserExits){
+        return res.status(400).json({
+            success : false ,
+            message : "No user exits with this userId"
+        })
+    }
+
+    const getallupvotes = await client.FeatureUpvote.findMany({
+      where : {
+        userId : userId
+      }
+    })
+
+    return res.status(200).json({
+      success : true , 
+      message : "all upvotes of user found successfully" , 
+      allupvotesuser : getallupvotes
+    })
+
+
+  }catch(e){
+    errorResponseFunctionForCatchInTryCatch(res ,e ,
+      "Error while getting all upvotes if user . Please try again later ! " ,500 ) ;
+  }
+}
+
 export const deleteFeatureRequest = async(req ,res) => {
     try{
             const {featureId ,userId } = req.body ; 

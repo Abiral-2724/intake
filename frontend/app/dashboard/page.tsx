@@ -48,7 +48,7 @@ export default function Dashboard() {
         <AppContent />
         <div className="flex-1 flex flex-col">
           <Navbar />
-          <main className="flex-1 flex items-center justify-center p-4 mt-[-30px]">
+          <main className="flex-1 flex items-center justify-center p-4 mb-30">
             {!hasForms ? (
               <div className="flex flex-col items-center justify-center max-w-md text-center">
                 {/* Empty State Illustration */}

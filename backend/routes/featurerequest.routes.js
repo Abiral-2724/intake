@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteFeatureRequest, downvoteFeatureRequest, getAllFeatureRequest, getAllFeatureRequestedByUser, searchFeatureRequestBasedOnName, sendFeatureRequest, upvoteFeatureRequest } from "../controllers/featurerequest.controllers.js";
+import { deleteFeatureRequest, downvoteFeatureRequest, getAllFeatureRequest, getAllFeatureRequestedByUser, getallUpvotesofUser, searchFeatureRequestBasedOnName, sendFeatureRequest, upvoteFeatureRequest } from "../controllers/featurerequest.controllers.js";
 import upload from "../middleware/multer.js";
 
 const router = express.Router() ; 
@@ -13,6 +13,8 @@ router.get('/get/all/feature/request/user/:userId' ,getAllFeatureRequestedByUser
 router.post('/upvote/Feature' ,upvoteFeatureRequest) 
 
 router.post('/downvote/feature' ,downvoteFeatureRequest)
+
+router.get('/all/upvote/user/:userId' ,getallUpvotesofUser)
 
 router.delete('/delete/feature' ,deleteFeatureRequest) 
 
