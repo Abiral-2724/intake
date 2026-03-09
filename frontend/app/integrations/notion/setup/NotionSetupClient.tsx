@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -69,7 +70,11 @@ export default function NotionSetupPage() {
           <Check className="w-8 h-8 text-green-600" />
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">All set!</h2>
-        <p className="text-sm text-gray-500">Notion is connected. New responses will appear in your database automatically.</p>
+        <p className="text-sm text-gray-500 mb-4">Notion is connected. Your existing responses are being synced now, and all new responses will appear automatically.</p>
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-400 bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />
+          Syncing existing responses in background…
+        </div>
       </div>
     </div>
   );

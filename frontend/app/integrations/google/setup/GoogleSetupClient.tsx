@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -64,13 +65,17 @@ export default function GoogleSetupPage() {
           <Check className="w-8 h-8 text-green-600" />
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Spreadsheet created!</h2>
-        <p className="text-sm text-gray-500 mb-5">Every new response will automatically appear in your Google Sheet.</p>
+        <p className="text-sm text-gray-500 mb-4">Your existing responses are being synced now, and every new submission will appear automatically.</p>
         {sheetUrl && (
           <a href={sheetUrl} target="_blank"
-            className="inline-flex items-center gap-2 text-sm text-green-600 hover:underline font-medium">
+            className="inline-flex items-center gap-2 text-sm text-green-600 hover:underline font-medium mb-4">
             <Sheet className="w-4 h-4" />Open your sheet <ExternalLink className="w-3.5 h-3.5" />
           </a>
         )}
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-400 bg-gray-50 rounded-xl px-4 py-3 border border-gray-100 mt-3">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />
+          Syncing existing responses in background…
+        </div>
       </div>
     </div>
   );
