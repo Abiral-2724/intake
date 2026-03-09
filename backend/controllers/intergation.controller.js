@@ -783,27 +783,24 @@ async function pushToNotion(integration, responseData) {
         const selectVal = String(val).replace(/,/g, " /").trim().slice(0, 100);
         properties[label] = { select: { name: selectVal } };
       } else if (propType === "multi_select") {
-        // If value is a string that contains commas (e.g. "Option A, Option B"),
-        // split it. Then sanitize each option — Notion bans commas in option names.
+        // Notion bans commas inside individual multi_select option names.
+        // Strategy:
+        //   - If val is an array  → each element is one option, sanitize commas out
+        //   - If val is a string  → treat the WHOLE string as one option (do NOT split
+        //     on commas because the answer itself may contain commas naturally e.g.
+        //     "Yes, my guest will also be attending.")
+        //     Just remove the commas from the option name before sending.
         let opts;
         if (Array.isArray(val)) {
-          opts = val.map(o => String(o));
+          opts = val.map(o => String(o).replace(/,/g, " /").trim()).filter(Boolean);
         } else {
-          opts = String(val).split(",").map(o => o.trim());
+          // Single string answer — keep as one option, strip commas
+          const cleaned = String(val).replace(/,/g, " /").trim().slice(0, 100);
+          opts = cleaned ? [cleaned] : [];
         }
-        const hasLongOptionsWithCommas = opts.some(o => o.includes(","));
-        if (hasLongOptionsWithCommas) {
-          // Fall back to rich_text to avoid mangling the answer
-          properties[label] = {
-            rich_text: [{ text: { content: opts.join(", ").slice(0, 2000) } }],
-          };
-        } else {
-          properties[label] = {
-            multi_select: opts
-              .filter(Boolean)
-              .map(o => ({ name: o.replace(/,/g, " /").trim().slice(0, 100) })),
-          };
-        }
+        properties[label] = {
+          multi_select: opts.map(o => ({ name: o.slice(0, 100) })),
+        };
       } else if (propType === "url") {
         properties[label] = { url: String(val) };
       } else if (propType === "date") {
