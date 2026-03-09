@@ -24,7 +24,7 @@ const RELEASES = [
     subtitle: "Connect your form responses to Notion and Google Sheets instantly.",
     highlights: [
       {
-        icon: BookOpen,
+        icon: "https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051092/icons8-notion-64_gb39hv.png",
         color: "text-gray-900",
         bg: "bg-gray-100",
         title: "Notion Integration",
@@ -32,7 +32,7 @@ const RELEASES = [
         tags: ["OAuth 2.0", "Auto-sync", "Bulk import", "Live"],
       },
       {
-        icon: Sheet,
+        icon: "https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051290/icons8-google-sheets-48_gcqjeh.png",
         color: "text-green-700",
         bg: "bg-green-100",
         title: "Google Sheets Integration",
@@ -40,7 +40,7 @@ const RELEASES = [
         tags: ["OAuth 2.0", "Auto-create sheet", "Real-time rows", "Live"],
       },
       {
-        icon: GitMerge,
+        icon: "https://res.cloudinary.com/dci6nuwrm/image/upload/v1773071657/icons8-merge-git-32_lutt2j.png",
         color: "text-violet-700",
         bg: "bg-violet-100",
         title: "Bulk historical sync",
@@ -266,7 +266,7 @@ function ReleaseCard({ release, isFirst }: { release: typeof RELEASES[0]; isFirs
             {release.highlights.map((h) => (
               <div key={h.title} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
                 <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center mb-3", h.bg)}>
-                  <h.icon className={cn("w-4.5 h-4.5", h.color)} style={{ width: 18, height: 18 }} />
+                  <img src={h.icon} alt="" />
                 </div>
                 <p className="text-sm font-semibold text-gray-900 mb-1.5">{h.title}</p>
                 <p className="text-xs text-gray-500 leading-relaxed mb-3">{h.description}</p>
