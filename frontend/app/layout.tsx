@@ -17,10 +17,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "intake",
+  description: "Collect information. Effortlessly.",
   icons: {
     icon: "https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg",
   },
-  description : "Collect information. Effortlessly."
+  verification: {
+    google: "qJhi0_OK0liUvaZiGMnl7DGtXvwok9zI0M3lo15",
+  },
 };
 
 export default function RootLayout({
