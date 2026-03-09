@@ -15,7 +15,7 @@ import {
   ArrowLeft, BarChart2, List, Table2, Download, Trash2, ChevronRight,
   User, Clock, Search, Star, ChevronDown, ChevronUp, FileText,
   Sheet, BookOpen, ExternalLink, Copy, Check, Plug, FileJson,
-  ArrowUpDown, Inbox, RefreshCw, Zap, Loader2, AlertCircle, Unlink,
+  ArrowUpDown, Inbox, RefreshCw, Zap, Loader2, AlertCircle, Unlink, Brain,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -541,6 +541,7 @@ export default function ResponsesPage() {
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleRefresh}><RefreshCw className="w-3.5 h-3.5"/>Refresh</Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 text-violet-600 border-violet-200 hover:bg-violet-50" onClick={()=>router.push(`/forms/${formId}/ai-insights`)}><Brain className="w-3.5 h-3.5"/>AI Insights</Button>
                 <Button variant="outline" size="sm" className={cn("h-8 text-xs gap-1.5",integrationPanelOpen&&"border-blue-400 text-blue-600")} onClick={()=>setIntegrationPanelOpen(p=>!p)}>
                   <Zap className="w-3.5 h-3.5"/>Integrations
                   {connectedIntegrations.filter(i=>i.status==="active").length>0&&<span className="bg-green-500 text-white text-[9px] font-bold px-1 py-0.5 rounded-full leading-none">{connectedIntegrations.filter(i=>i.status==="active").length}</span>}
@@ -579,7 +580,7 @@ export default function ResponsesPage() {
                       <div className={cn("border-2 rounded-xl p-5 transition-all",isActive?"border-gray-900 bg-gray-50":isError?"border-red-200 bg-red-50":"border-gray-200 bg-white hover:border-gray-300")}>
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center"><BookOpen className="w-5 h-5 text-gray-800"/></div>
+                            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center"><img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051092/icons8-notion-64_gb39hv.png" alt="" /></div>
                             <div>
                               <p className="text-sm font-semibold text-gray-900">Notion</p>
                               <p className="text-xs text-gray-400">Sync to a database</p>
@@ -589,7 +590,7 @@ export default function ResponsesPage() {
                           {isError&&<span className="flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full"><AlertCircle className="w-3 h-3"/>Error</span>}
                         </div>
                         {isActive&&notion?.config?.databaseTitle&&(
-                          <div className="mb-3 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-1.5"><BookOpen className="w-3 h-3 text-gray-400 shrink-0"/><span className="truncate">{notion.config.databaseTitle}</span></div>
+                          <div className="mb-3 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-1.5"><img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051092/icons8-notion-64_gb39hv.png" alt="" className="w-5 h-5"/><span className="truncate">{notion.config.databaseTitle}</span></div>
                         )}
                         {isError&&notion?.lastError&&(
                           <div className="mb-3 text-xs text-red-600 bg-white border border-red-200 rounded-lg px-3 py-2">{notion.lastError}</div>
@@ -601,7 +602,7 @@ export default function ResponsesPage() {
                           </button>
                         ):(
                           <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white h-9 text-xs font-medium gap-2" disabled={connecting==="notion"} onClick={()=>handleConnect("notion")}>
-                            {connecting==="notion"?<><Loader2 className="w-3.5 h-3.5 animate-spin"/>Connecting…</>:<><BookOpen className="w-3.5 h-3.5"/>Connect Notion</>}
+                            {connecting==="notion"?<><Loader2 className="w-3.5 h-3.5 animate-spin"/>Connecting…</>:<><img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051092/icons8-notion-64_gb39hv.png" alt="" className="w-5 h-5"/>Connect Notion</>}
                           </Button>
                         )}
                       </div>
@@ -617,7 +618,7 @@ export default function ResponsesPage() {
                       <div className={cn("border-2 rounded-xl p-5 transition-all",isActive?"border-green-600 bg-green-50/50":isError?"border-red-200 bg-red-50":"border-gray-200 bg-white hover:border-gray-300")}>
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center"><Sheet className="w-5 h-5 text-green-600"/></div>
+                            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center"><img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051290/icons8-google-sheets-48_gcqjeh.png" alt="" /></div>
                             <div>
                               <p className="text-sm font-semibold text-gray-900">Google Sheets</p>
                               <p className="text-xs text-gray-400">Sync to a spreadsheet</p>
@@ -628,7 +629,7 @@ export default function ResponsesPage() {
                         </div>
                         {isActive&&gs?.config?.spreadsheetUrl&&(
                           <a href={gs.config.spreadsheetUrl} target="_blank" className="mb-3 flex items-center gap-1.5 text-xs text-green-700 bg-white border border-green-200 rounded-lg px-3 py-2 hover:bg-green-50 transition-colors">
-                            <Sheet className="w-3 h-3 shrink-0"/>Open spreadsheet<ExternalLink className="w-3 h-3 ml-auto shrink-0"/>
+                            <img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051290/icons8-google-sheets-48_gcqjeh.png" alt="" className="w-5 h-5"/>Open spreadsheet<ExternalLink className="w-3 h-3 ml-auto shrink-0"/>
                           </a>
                         )}
                         {isError&&gs?.lastError&&(
@@ -641,7 +642,7 @@ export default function ResponsesPage() {
                           </button>
                         ):(
                           <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-9 text-xs font-medium gap-2" disabled={connecting==="sheets"} onClick={()=>handleConnect("sheets")}>
-                            {connecting==="sheets"?<><Loader2 className="w-3.5 h-3.5 animate-spin"/>Connecting…</>:<><Sheet className="w-3.5 h-3.5"/>Connect Google Sheets</>}
+                            {connecting==="sheets"?<><Loader2 className="w-3.5 h-3.5 animate-spin"/>Connecting…</>:<> <img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1773051290/icons8-google-sheets-48_gcqjeh.png" alt="" className="w-5 h-5"/>Connect Google Sheets</>}
                           </Button>
                         )}
                       </div>

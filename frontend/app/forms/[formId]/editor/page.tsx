@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import LoadingPage from "@/components/LoadingPage";
+import AIBlockSuggestions from "@/components/AIBlockSuggestions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ import {
   ArrowLeft, Plus, Eye, MoreHorizontal, Trash2, Copy, GripVertical,
   ChevronDown, CheckCircle2, Type, List, CheckSquare, Hash, Mail, Phone,
   Link, Upload, Calendar, Clock, Star, AlignLeft, Minus, Image, Globe,
-  SlidersHorizontal, BarChart2, Search, GitBranch, Sparkles, Wand2,
+  SlidersHorizontal, BarChart2, Search, GitBranch, Sparkles, Wand2, Languages, Brain,
   Share2, Check, ExternalLink, Palette,
 } from "lucide-react";
 import axios from "axios";
@@ -1011,6 +1012,14 @@ export default function FormEditorPage() {
             </TooltipTrigger><TooltipContent>Share</TooltipContent></Tooltip>
 
             <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-violet-600 hover:text-violet-700 hover:bg-violet-50" onClick={()=>router.push(`/forms/${formId}/ai-insights`)}><Brain className="w-4 h-4" /></Button>
+            </TooltipTrigger><TooltipContent>AI Insights</TooltipContent></Tooltip>
+
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50" onClick={()=>router.push(`/forms/${formId}/translate`)}><Languages className="w-4 h-4" /></Button>
+            </TooltipTrigger><TooltipContent>Auto-translate</TooltipContent></Tooltip>
+
+            <Tooltip><TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=>router.push(`/forms/${formId}/responses`)}><BarChart2 className="w-4 h-4" /></Button>
             </TooltipTrigger><TooltipContent>Responses</TooltipContent></Tooltip>
 
@@ -1053,6 +1062,14 @@ export default function FormEditorPage() {
                       onAddAfter={(id,type)=>handleAddBlock(type,id)}
                     />
                   ))}
+                </div>
+
+                {/* AI Block Suggestions */}
+                <div className="mt-5 mb-4">
+                  <AIBlockSuggestions formId={formId} onBlockAdded={async () => {
+                    const r = await axios.get(`${process.env.NEXT_PUBLIC_API_URL||"http://localhost:8000/api/v1"}/forms/${formId}/blocks`, { headers: { "x-user-id": user.id } });
+                    if (r.data.data) setBlocks(r.data.data);
+                  }} />
                 </div>
 
                 {/* Bottom toolbar */}
