@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
+{/* <meta name="google-site-verification" content="w-auKxdR9b5JHgyfHO5loJ74KpzaICktQHb6rGsBV-8" /> */}
 export const metadata: Metadata = {
   title: "intake",
   description: "Collect information. Effortlessly.",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     icon: "https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg",
   },
   verification: {
-    google: "qJhi0_OK0liUvaZiGMnl7DGtXvwok9zI0M3lo15",
+    google: "w-auKxdR9b5JHgyfHO5loJ74KpzaICktQHb6rGsBV-8",
   },
 };
 
