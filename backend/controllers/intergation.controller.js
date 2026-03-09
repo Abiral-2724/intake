@@ -779,10 +779,31 @@ async function pushToNotion(integration, responseData) {
         const num = Number(val);
         if (!isNaN(num)) properties[label] = { number: num };
       } else if (propType === "select") {
-        properties[label] = { select: { name: String(val) } };
+        // Notion select options cannot contain commas — replace with " /"
+        const selectVal = String(val).replace(/,/g, " /").trim().slice(0, 100);
+        properties[label] = { select: { name: selectVal } };
       } else if (propType === "multi_select") {
-        const opts = Array.isArray(val) ? val : [String(val)];
-        properties[label] = { multi_select: opts.filter(Boolean).map(o => ({ name: String(o) })) };
+        // If value is a string that contains commas (e.g. "Option A, Option B"),
+        // split it. Then sanitize each option — Notion bans commas in option names.
+        let opts;
+        if (Array.isArray(val)) {
+          opts = val.map(o => String(o));
+        } else {
+          opts = String(val).split(",").map(o => o.trim());
+        }
+        const hasLongOptionsWithCommas = opts.some(o => o.includes(","));
+        if (hasLongOptionsWithCommas) {
+          // Fall back to rich_text to avoid mangling the answer
+          properties[label] = {
+            rich_text: [{ text: { content: opts.join(", ").slice(0, 2000) } }],
+          };
+        } else {
+          properties[label] = {
+            multi_select: opts
+              .filter(Boolean)
+              .map(o => ({ name: o.replace(/,/g, " /").trim().slice(0, 100) })),
+          };
+        }
       } else if (propType === "url") {
         properties[label] = { url: String(val) };
       } else if (propType === "date") {
