@@ -90,6 +90,14 @@ model User {
 
   featureRequested featureRequest[]
   upvotes FeatureUpvote[]
+
+
+// new form builder relations
+  ownedWorkspaces        Workspace[]
+  workspaceMemberships   WorkspaceMember[]
+  responses              Response[]
+
+
   @@map("users")
 }
 
@@ -125,3 +133,317 @@ model FeatureUpvote {
 
   @@unique([featureId, userId])
 }
+
+
+
+
+enum FormStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+enum WorkspaceMemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum BlockType {
+  // ── Layout blocks ──────────────────────────────────────────
+  NEW_PAGE
+  THANK_YOU_PAGE
+  TEXT
+  HEADING_1
+  HEADING_2
+  HEADING_3
+  DIVIDER
+  TITLE
+  LABEL
+
+  // ── Embed blocks ───────────────────────────────────────────
+  IMAGE
+  VIDEO
+  AUDIO
+  EMBED
+
+  // ── Input / Question blocks ────────────────────────────────
+  SHORT_ANSWER
+  LONG_ANSWER
+  MULTIPLE_CHOICE
+  CHECKBOXES
+  DROPDOWN
+  MULTI_SELECT
+  NUMBER
+  EMAIL
+  PHONE_NUMBER
+  LINK
+  FILE_UPLOAD
+  DATE
+  TIME
+  LINEAR_SCALE
+  MATRIX
+  RATING
+  PAYMENT
+  SIGNATURE
+  RANKING
+
+  // ── Advanced blocks ────────────────────────────────────────
+  CONDITIONAL_LOGIC
+  CALCULATED_FIELD
+  HIDDEN_FIELD
+  RECAPTCHA
+  RESPONDENT_COUNTRY
+  WALLET_CONNECT
+}
+
+
+// ── Workspace ─────────────────────────────────────────────────
+// Top-level container. A user can own multiple workspaces.
+// Each workspace contains multiple forms.
+model Workspace {
+  id        String            @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String            @unique
+  logoUrl   String?
+  ownerId   String            @db.Uuid
+  owner     User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members   WorkspaceMember[]
+  forms     Form[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@map("workspaces")
+}
+
+// ── Workspace Member ──────────────────────────────────────────
+// Enables team collaboration. Each user has a role per workspace.
+model WorkspaceMember {
+  id          String              @id @default(uuid()) @db.Uuid
+  workspaceId String              @db.Uuid
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String              @db.Uuid
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceMemberRole @default(VIEWER)
+  createdAt   DateTime            @default(now())
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+// ── Form ──────────────────────────────────────────────────────
+// Core form entity. `slug` is the short public URL identifier
+// e.g. /f/abc123 for sharing and embedding.
+model Form {
+  id          String        @id @default(uuid()) @db.Uuid
+  title       String        @default("Untitled form")
+  description String?
+  logoUrl     String?
+  coverUrl    String?
+  slug        String        @unique
+  status      FormStatus    @default(DRAFT)
+  workspaceId String        @db.Uuid
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  blocks      Block[]
+  responses   Response[]
+  settings    FormSettings?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("forms")
+}
+
+
+// ── Form Settings ─────────────────────────────────────────────
+// Separated from Form to keep the forms table clean.
+// 1-to-1 with Form, auto-created alongside every new Form.
+// model FormSettings {
+//   id     String @id @default(uuid()) @db.Uuid
+//   formId String @unique @db.Uuid
+//   form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+//   // Submission behaviour
+//   allowMultipleSubmissions Boolean   @default(true)
+//   requireLogin             Boolean   @default(false)
+//   submitButtonLabel        String    @default("Submit")
+//   redirectUrl              String?
+//   thankYouMessage          String    @default("Thank you for your response!")
+
+//   // Notifications
+//   notifyOwnerEmail         Boolean   @default(false)
+//   notificationEmails       String[]
+
+//   // Limits
+//   maxResponses             Int?
+//   closedAt                 DateTime?
+
+//   // Branding
+//   hideBranding             Boolean   @default(false)
+//   primaryColor             String    @default("#000000")
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("form_settings")
+// }
+
+
+// ── Block ─────────────────────────────────────────────────────
+// Every element on a form is a block. This covers layout blocks
+// (headings, dividers), input blocks (short answer, rating),
+// and advanced blocks (conditional logic, hidden fields).
+//
+// Design notes:
+//   - `order` is Float — inserting between two blocks is as simple
+//     as averaging their order values (e.g. 1.5 between 1 and 2),
+//     avoiding full reindexing on every drag & drop.
+//   - `config` (Json) holds type-specific config:
+//       MULTIPLE_CHOICE → { options: ["A","B","C"] }
+//       RATING          → { maxRating: 5, shape: "star" }
+//       LINEAR_SCALE    → { min: 1, max: 10, minLabel: "Bad", maxLabel: "Great" }
+//       SHORT_ANSWER    → { placeholder: "Type here..." }
+//   - `logic` (Json) holds conditional rules:
+//       { if: { blockId: "x", op: "equals", value: "Yes" }, then: { action: "show", blockId: "y" } }
+//   - `groupId` links a block to a page (references the id of a NEW_PAGE block).
+model Block {
+  id        String    @id @default(uuid()) @db.Uuid
+  formId    String    @db.Uuid
+  form      Form      @relation(fields: [formId], references: [id], onDelete: Cascade)
+  type      BlockType
+  order     Float
+  label     String?
+  required  Boolean   @default(false)
+  config    Json      @default("{}")
+  logic     Json?
+  groupId   String?   @db.Uuid
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  answers   Answer[]
+
+  @@map("blocks")
+}
+
+// ── Response ──────────────────────────────────────────────────
+// One Response = one complete form submission.
+// Optionally linked to a User when requireLogin = true.
+// `metadata` stores: { ip, userAgent, referrer, timeToCompleteMs }
+model Response {
+  id          String   @id @default(uuid()) @db.Uuid
+  formId      String   @db.Uuid
+  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  userId      String?  @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  answers     Answer[]
+  isComplete  Boolean  @default(true)
+  metadata    Json?
+  submittedAt DateTime @default(now())
+
+  @@map("responses")
+}
+
+// ── Answer ────────────────────────────────────────────────────
+// One Answer per Block per Response.
+// `value` is Json to handle every answer type uniformly:
+//   Short answer    → "some text"
+//   Multiple choice → "Option A"
+//   Checkboxes      → ["Option A", "Option C"]
+//   Rating          → 4
+//   File upload     → "https://storage.url/file.pdf"
+//   Matrix          → { "Row 1": "Col B", "Row 2": "Col A" }
+model Answer {
+  id         String   @id @default(uuid()) @db.Uuid
+  responseId String   @db.Uuid
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  blockId    String   @db.Uuid
+  block      Block    @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  value      Json
+  createdAt  DateTime @default(now())
+
+  @@unique([responseId, blockId])
+  @@map("answers")
+}
+
+
+
+model FormSettings {
+  id     String @id @default(uuid()) @db.Uuid
+  formId String @unique @db.Uuid
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  // Submission behaviour
+  allowMultipleSubmissions Boolean   @default(true)
+  requireLogin             Boolean   @default(false)
+  submitButtonLabel        String    @default("Submit")
+  redirectUrl              String?
+  thankYouMessage          String    @default("Thank you for your response!")
+
+  // Notifications
+  notifyOwnerEmail         Boolean   @default(false)
+  notificationEmails       String[]
+
+  // Limits
+  maxResponses             Int?
+  closedAt                 DateTime?
+
+  // Branding / Theme
+  hideBranding             Boolean   @default(false)
+  primaryColor             String    @default("#2563eb")
+  bgColor                  String?
+  textColor                String?
+  fontFamily               String?
+  coverUrl                 String?
+  logoUrl                  String?
+  borderRadius             String?
+  progressBar              Boolean   @default(true)
+
+  // Security
+  passwordHash             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  integrations Integration[]
+
+  @@map("form_settings")
+}
+
+
+model Integration {
+  id           String   @id @default(uuid()) @db.Uuid
+  formId       String   @db.Uuid
+  form         FormSettings     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  type         String   // "notion" | "google_sheets"
+  status       String   @default("active") // "active" | "error" | "disconnected"
+
+  // OAuth tokens (encrypted in production via env-level encryption)
+  accessToken  String
+  refreshToken String?
+  tokenExpiry  DateTime?
+
+  // Integration-specific config
+  config       Json     // { databaseId, spreadsheetId, sheetName, columnMap, ... }
+
+  lastSyncAt   DateTime?
+  lastError    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([formId, type])
+  @@map("integrations")
+}
+
+model OAuthState {
+  id        String   @id @default(uuid()) @db.Uuid
+  state     String   @unique  // random CSRF token
+  userId    String   // Supabase user id  (plain string — Supabase UIDs are not @db.Uuid)
+  formId    String   @db.Uuid            // MUST match Form.id type exactly
+  type      String   // "notion" | "google_sheets"
+  createdAt DateTime @default(now())
+
+  // ⚠️ IMPORTANT: formId MUST have @db.Uuid to match the forms table PK.
+  // Without it, Postgres receives a plain varchar which fails the FK constraint.
+
+  @@map("oauth_states")
+}
+
