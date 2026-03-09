@@ -23,7 +23,8 @@ import {
   ArrowLeft, Plus, Eye, MoreHorizontal, Trash2, Copy, GripVertical,
   ChevronDown, CheckCircle2, Type, List, CheckSquare, Hash, Mail, Phone,
   Link, Upload, Calendar, Clock, Star, AlignLeft, Minus, Image, Globe,
-  SlidersHorizontal, BarChart2, Search, GitBranch, Sparkles, Wand2, Languages, Brain,
+  SlidersHorizontal, BarChart2, Search, GitBranch, Sparkles, Wand2, Languages, Brain, TrendingUp,
+  Scissors, BookOpen,  Layout,
   Share2, Check, ExternalLink, Palette,
 } from "lucide-react";
 import axios from "axios";
@@ -60,10 +61,14 @@ const BLOCK_GROUPS = [
     { type: "RATING",          icon: Star,              label: "Rating",          desc: "Star rating" },
     { type: "LINEAR_SCALE",    icon: SlidersHorizontal, label: "Linear scale",    desc: "Numeric scale" },
   ]},
+  { label: "Pages", blocks: [
+    { type: "NEW_PAGE",        icon: Scissors,          label: "Page break",      desc: "Split form into multiple pages" },
+  ]},
 ];
 const ALL_BLOCKS = BLOCK_GROUPS.flatMap((g) => g.blocks);
 const LAYOUT_TYPES = ["HEADING_1","HEADING_2","TEXT","DIVIDER","IMAGE"];
 const ICON_MAP: Record<string,any> = Object.fromEntries(ALL_BLOCKS.map((b) => [b.type, b.icon]));
+ICON_MAP["NEW_PAGE"] = Scissors;
 
 type Block = { id: string; type: string; label: string; required: boolean; config: any; logic?: any; order: number };
 type Form  = { id: string; title: string; description?: string; slug: string; status: "DRAFT"|"PUBLISHED"|"CLOSED"|"ARCHIVED"; blocks: Block[]; settings?: any };
@@ -339,6 +344,26 @@ function BlockRow({ block, isSelected, onSelect, onUpdate, onDelete, onDuplicate
     }
   };
 
+  // ── NEW_PAGE renders as a visible page-break divider ────────────
+  if (block.type === "NEW_PAGE") {
+    return (
+      <div className="relative flex items-center gap-3 py-3 group/pb">
+        <div className="flex-1 border-t-2 border-dashed border-blue-300" />
+        <div className="flex items-center gap-2 bg-blue-50 border border-blue-300 rounded-xl px-4 py-2 shrink-0 select-none">
+          <Scissors className="w-3.5 h-3.5 text-blue-500" />
+          <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Page break</span>
+        </div>
+        <div className="flex-1 border-t-2 border-dashed border-blue-300" />
+        {/* Delete page break on hover */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete(block.id); }}
+          className="absolute right-0 opacity-0 group-hover/pb:opacity-100 transition-opacity bg-white border border-red-200 hover:bg-red-50 text-red-500 text-[10px] font-semibold px-2 py-1 rounded-lg shadow-sm">
+          Remove
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("group/block relative flex items-start gap-1.5 rounded-xl py-3 px-3 transition-all duration-100 cursor-pointer",
         isSelected?"bg-gray-50 ring-1 ring-gray-200":"hover:bg-gray-50/70")}
@@ -407,7 +432,14 @@ function BlockRow({ block, isSelected, onSelect, onUpdate, onDelete, onDuplicate
 // ─────────────────────────────────────────────
 //  SETTINGS TAB
 // ─────────────────────────────────────────────
-function SettingsTab({ formId, userId, initialSettings }: { formId: string; userId: string; initialSettings: any }) {
+function SettingsTab({ formId, userId, initialSettings, blocks, onAddPageBreak, onDeletePageBreak }: {
+  formId: string;
+  userId: string;
+  initialSettings: any;
+  blocks: Block[];
+  onAddPageBreak: (afterId: string | null) => void;
+  onDeletePageBreak: (id: string) => void;
+}) {
   const [s, setS] = useState({
     allowMultipleSubmissions: initialSettings?.allowMultipleSubmissions??true,
     requireLogin:             initialSettings?.requireLogin??false,
@@ -422,6 +454,7 @@ function SettingsTab({ formId, userId, initialSettings }: { formId: string; user
     progressBar:              initialSettings?.progressBar??true,
   });
   const [saving, setSaving] = useState(false);
+  const [pagesTab, setPagesTab] = useState<"settings"|"pages">("settings");
   const upd = (k: string, v: any) => setS((p)=>({...p,[k]:v}));
   const save = async () => {
     setSaving(true);
@@ -436,6 +469,7 @@ function SettingsTab({ formId, userId, initialSettings }: { formId: string; user
     } catch { toast.error("Failed to save settings"); }
     finally { setSaving(false); }
   };
+
   const Row = ({label,hint,children}:{label:string;hint?:string;children:React.ReactNode}) => (
     <div className="flex items-center justify-between gap-6 py-3.5 border-b border-gray-100 last:border-0">
       <div><p className="text-sm font-medium text-gray-800">{label}</p>{hint&&<p className="text-xs text-gray-400 mt-0.5">{hint}</p>}</div>
@@ -448,35 +482,202 @@ function SettingsTab({ formId, userId, initialSettings }: { formId: string; user
       <div className="bg-white border border-gray-200 rounded-xl px-4">{children}</div>
     </div>
   );
+
+  // ── Page manager ────────────────────────────────────────────────
+  // Build a visual representation: split blocks into pages separated by NEW_PAGE blocks
+  const pageBreakIds = blocks.filter(b => b.type === "NEW_PAGE").map(b => b.id);
+  const totalPages   = pageBreakIds.length + 1;
+
+  // Build page sections for the visual manager
+  type PageSection = { pageNum: number; blocks: Block[]; breakBlockId: string | null };
+  const pageSections: PageSection[] = [];
+  let pageNum = 1;
+  let pageBlocks: Block[] = [];
+  for (const block of blocks) {
+    if (block.type === "NEW_PAGE") {
+      pageSections.push({ pageNum, blocks: pageBlocks, breakBlockId: block.id });
+      pageNum++;
+      pageBlocks = [];
+    } else {
+      pageBlocks.push(block);
+    }
+  }
+  pageSections.push({ pageNum, blocks: pageBlocks, breakBlockId: null });
+
+  // Last non-page-break block id (to add a page break after)
+  const questionBlocks = blocks.filter(b => b.type !== "NEW_PAGE");
+  const lastQuestionId = questionBlocks[questionBlocks.length - 1]?.id ?? null;
+
   return (
-    <div className="max-w-xl mx-auto py-8 px-6 space-y-6">
-      <Section title="Behaviour">
-        <Row label="Allow multiple submissions" hint="Same person can submit more than once"><Switch checked={s.allowMultipleSubmissions} onCheckedChange={(v)=>upd("allowMultipleSubmissions",v)} /></Row>
-        <Row label="Require login" hint="Must be signed in to submit"><Switch checked={s.requireLogin} onCheckedChange={(v)=>upd("requireLogin",v)} /></Row>
-        <Row label="Email me on new response"><Switch checked={s.notifyOwnerEmail} onCheckedChange={(v)=>upd("notifyOwnerEmail",v)} /></Row>
-        <Row label="Show progress bar" hint="Displays completion % to respondents"><Switch checked={s.progressBar} onCheckedChange={(v)=>upd("progressBar",v)} /></Row>
-        <Row label="Hide branding" hint="Remove 'Powered by Intake' footer"><Switch checked={s.hideBranding} onCheckedChange={(v)=>upd("hideBranding",v)} /></Row>
-      </Section>
-      <Section title="Content">
-        <Row label="Submit button label"><Input className="h-8 text-sm w-40 text-right" value={s.submitButtonLabel} onChange={(e)=>upd("submitButtonLabel",e.target.value)} /></Row>
-        <Row label="Thank you message"><Input className="h-8 text-sm w-56 text-right" value={s.thankYouMessage} onChange={(e)=>upd("thankYouMessage",e.target.value)} /></Row>
-        <Row label="Redirect URL" hint="After submission (optional)"><Input className="h-8 text-sm w-56 text-right" placeholder="https://…" value={s.redirectUrl} onChange={(e)=>upd("redirectUrl",e.target.value)} /></Row>
-      </Section>
-      <Section title="Limits">
-        <Row label="Max responses" hint="Leave blank for unlimited"><Input type="number" className="h-8 text-sm w-28 text-right" placeholder="∞" value={s.maxResponses} onChange={(e)=>upd("maxResponses",e.target.value)} /></Row>
-        <Row label="Close form at" hint="Leave blank to keep open"><Input type="datetime-local" className="h-8 text-sm w-48" value={s.closedAt} onChange={(e)=>upd("closedAt",e.target.value)} /></Row>
-      </Section>
-      <Section title="Branding">
-        <Row label="Primary color">
-          <div className="flex items-center gap-2">
-            <input type="color" value={s.primaryColor} onChange={(e)=>upd("primaryColor",e.target.value)} className="w-8 h-8 rounded border border-gray-200 cursor-pointer p-0.5" />
-            <Input className="h-8 text-sm w-24 font-mono" value={s.primaryColor} onChange={(e)=>upd("primaryColor",e.target.value)} />
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-xl mx-auto py-8 px-6">
+        {/* Tab switcher */}
+        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 mb-6">
+          <button onClick={() => setPagesTab("settings")}
+            className={cn("flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-sm font-medium transition-all",
+              pagesTab === "settings" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+            <SlidersHorizontal className="w-3.5 h-3.5" /> Settings
+          </button>
+          <button onClick={() => setPagesTab("pages")}
+            className={cn("flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-sm font-medium transition-all",
+              pagesTab === "pages" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+            <Layout className="w-3.5 h-3.5" /> Pages
+            {totalPages > 1 && (
+              <span className="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none ml-0.5">
+                {totalPages}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* ── SETTINGS PANEL ── */}
+        {pagesTab === "settings" && (
+          <div className="space-y-6">
+            <Section title="Behaviour">
+              <Row label="Allow multiple submissions" hint="Same person can submit more than once"><Switch checked={s.allowMultipleSubmissions} onCheckedChange={(v)=>upd("allowMultipleSubmissions",v)} /></Row>
+              <Row label="Require login" hint="Must be signed in to submit"><Switch checked={s.requireLogin} onCheckedChange={(v)=>upd("requireLogin",v)} /></Row>
+              <Row label="Email me on new response"><Switch checked={s.notifyOwnerEmail} onCheckedChange={(v)=>upd("notifyOwnerEmail",v)} /></Row>
+              <Row label="Show progress bar" hint="Displays completion % to respondents"><Switch checked={s.progressBar} onCheckedChange={(v)=>upd("progressBar",v)} /></Row>
+              <Row label="Hide branding" hint="Remove 'Powered by Intake' footer"><Switch checked={s.hideBranding} onCheckedChange={(v)=>upd("hideBranding",v)} /></Row>
+            </Section>
+            <Section title="Content">
+              <Row label="Submit button label"><Input className="h-8 text-sm w-40 text-right" value={s.submitButtonLabel} onChange={(e)=>upd("submitButtonLabel",e.target.value)} /></Row>
+              <Row label="Thank you message"><Input className="h-8 text-sm w-56 text-right" value={s.thankYouMessage} onChange={(e)=>upd("thankYouMessage",e.target.value)} /></Row>
+              <Row label="Redirect URL" hint="After submission (optional)"><Input className="h-8 text-sm w-56 text-right" placeholder="https://…" value={s.redirectUrl} onChange={(e)=>upd("redirectUrl",e.target.value)} /></Row>
+            </Section>
+            <Section title="Limits">
+              <Row label="Max responses" hint="Leave blank for unlimited"><Input type="number" className="h-8 text-sm w-28 text-right" placeholder="∞" value={s.maxResponses} onChange={(e)=>upd("maxResponses",e.target.value)} /></Row>
+              <Row label="Close form at" hint="Leave blank to keep open"><Input type="datetime-local" className="h-8 text-sm w-48" value={s.closedAt} onChange={(e)=>upd("closedAt",e.target.value)} /></Row>
+            </Section>
+            <Section title="Branding">
+              <Row label="Primary color">
+                <div className="flex items-center gap-2">
+                  <input type="color" value={s.primaryColor} onChange={(e)=>upd("primaryColor",e.target.value)} className="w-8 h-8 rounded border border-gray-200 cursor-pointer p-0.5" />
+                  <Input className="h-8 text-sm w-24 font-mono" value={s.primaryColor} onChange={(e)=>upd("primaryColor",e.target.value)} />
+                </div>
+              </Row>
+            </Section>
+            <Button onClick={save} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white w-full h-10 text-sm font-medium">
+              {saving?"Saving…":"Save settings"}
+            </Button>
           </div>
-        </Row>
-      </Section>
-      <Button onClick={save} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white w-full h-10 text-sm font-medium">
-        {saving?"Saving…":"Save settings"}
-      </Button>
+        )}
+
+        {/* ── PAGES PANEL ── */}
+        {pagesTab === "pages" && (
+          <div className="space-y-5">
+            {/* Explainer */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
+              <Layout className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-blue-900">Multi-page forms</p>
+                <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
+                  Split your form into pages. Each page shows one group of questions with a Next button.
+                  Required fields are validated per page before moving forward.
+                </p>
+              </div>
+            </div>
+
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "Pages", value: totalPages },
+                { label: "Page breaks", value: pageBreakIds.length },
+                { label: "Questions", value: blocks.filter(b => !["NEW_PAGE","HEADING_1","HEADING_2","TEXT","DIVIDER"].includes(b.type)).length },
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-white border border-gray-200 rounded-xl p-3 text-center">
+                  <p className="text-2xl font-bold text-gray-900">{value}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Page list */}
+            <div className="space-y-2">
+              {pageSections.map((section, idx) => (
+                <div key={idx}>
+                  {/* Page card */}
+                  <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                    {/* Page header */}
+                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                          {section.pageNum}
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Page {section.pageNum}
+                          {section.pageNum === 1 && <span className="text-gray-400 font-normal ml-1.5">(first page)</span>}
+                          {section.pageNum === totalPages && totalPages > 1 && <span className="text-gray-400 font-normal ml-1.5">(last page — submit)</span>}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {section.blocks.filter(b => !["HEADING_1","HEADING_2","TEXT","DIVIDER"].includes(b.type)).length} question{section.blocks.filter(b => !["HEADING_1","HEADING_2","TEXT","DIVIDER"].includes(b.type)).length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+
+                    {/* Block list for this page */}
+                    <div className="px-4 py-2 divide-y divide-gray-50">
+                      {section.blocks.length === 0 ? (
+                        <p className="text-xs text-gray-400 py-3 text-center italic">Empty page</p>
+                      ) : (
+                        section.blocks.map(b => (
+                          <div key={b.id} className="flex items-center gap-2.5 py-2">
+                            <GripVertical className="w-3 h-3 text-gray-200 shrink-0" />
+                            <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0",
+                              ["HEADING_1","HEADING_2","TEXT","DIVIDER"].includes(b.type)
+                                ? "bg-gray-100 text-gray-400"
+                                : "bg-blue-50 text-blue-600")}>
+                              {b.type.replace(/_/g, " ")}
+                            </span>
+                            <span className="text-xs text-gray-600 truncate">{b.label || <em className="text-gray-300">No label</em>}</span>
+                            {b.required && <span className="text-red-400 text-xs shrink-0">*</span>}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Page break divider between pages */}
+                  {section.breakBlockId && (
+                    <div className="relative flex items-center gap-3 py-2 px-2 group">
+                      <div className="flex-1 border-t-2 border-dashed border-blue-300" />
+                      <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 shrink-0">
+                        <Scissors className="w-3 h-3 text-blue-500" />
+                        <span className="text-xs font-semibold text-blue-600">Page break</span>
+                      </div>
+                      <div className="flex-1 border-t-2 border-dashed border-blue-300" />
+                      <button
+                        onClick={() => onDeletePageBreak(section.breakBlockId!)}
+                        className="absolute right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-red-50 hover:bg-red-100 border border-red-200 text-red-500 text-[10px] font-semibold px-2 py-1 rounded-lg">
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Add page break button */}
+            <button
+              onClick={() => onAddPageBreak(lastQuestionId)}
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-semibold text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all">
+              <Scissors className="w-4 h-4" />
+              Add page break at end
+            </button>
+
+            {totalPages > 1 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
+                <span className="text-amber-500 text-sm shrink-0">💡</span>
+                <p className="text-xs text-amber-700">
+                  You can also add a page break directly in the <strong>Build</strong> tab by clicking
+                  the <strong>+</strong> button between any two blocks and selecting "Page break".
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
@@ -1020,6 +1221,10 @@ export default function FormEditorPage() {
             </TooltipTrigger><TooltipContent>Auto-translate</TooltipContent></Tooltip>
 
             <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50" onClick={()=>router.push(`/forms/${formId}/analytics`)}><TrendingUp className="w-4 h-4" /></Button>
+            </TooltipTrigger><TooltipContent>Analytics</TooltipContent></Tooltip>
+
+            <Tooltip><TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=>router.push(`/forms/${formId}/responses`)}><BarChart2 className="w-4 h-4" /></Button>
             </TooltipTrigger><TooltipContent>Responses</TooltipContent></Tooltip>
 
@@ -1111,7 +1316,14 @@ export default function FormEditorPage() {
 
           {activeTab==="settings"&&(
             <div className="h-full overflow-y-auto bg-gray-50/40">
-              <SettingsTab formId={formId} userId={user.id} initialSettings={form.settings} />
+              <SettingsTab
+                formId={formId}
+                userId={user.id}
+                initialSettings={form.settings}
+                blocks={blocks}
+                onAddPageBreak={(afterId) => handleAddBlock("NEW_PAGE", afterId)}
+                onDeletePageBreak={(id) => handleDelete(id)}
+              />
             </div>
           )}
 
