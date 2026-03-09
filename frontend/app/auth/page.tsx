@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 // Replace with your actual Turnstile site key
-const TURNSTILE_SITE_KEY = "0x4AAAAAACJ4iix3SZQIUtNj"
+const TURNSTILE_SITE_KEY = "0x4AAAAAACoZzhxiNgcb-AkL"
 // Backend API URL
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 
