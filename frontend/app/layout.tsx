@@ -18,9 +18,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "intake",
   description: "Collect information. Effortlessly.",
-  icons: {
-    icon: "https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg",
+  appleWebApp: {
+    title: "intake",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon1.png", type: "image/png" },
+      { url: "/icon0.svg", type: "image/svg+xml" }
+    ],
+    apple: "/apple-icon.png",
+  },
+
+  manifest: "/manifest.json",
   verification: {
     google: "w-auKxdR9b5JHgyfHO5loJ74KpzaICktQHb6rGsBV-8",
   },

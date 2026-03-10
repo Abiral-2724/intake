@@ -135,10 +135,16 @@ export default function AppContent() {
         <SidebarHeader className="border-b border-gray-200/60 px-4 py-3.5">
           <div className="flex items-center justify-between">
             <button onClick={() => nav("/dashboard")} className="flex items-center gap-2.5 group">
-              <div className="w-7 h-7 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-blue-200 transition-shadow">
-                <span className="text-white text-xs font-black tracking-tight">I</span>
+              <div className="mt-[-4]">
+              <a href="/dashboard" className="flex items-center gap-2 mr-1">
+            <img
+              src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg"
+              alt="Intake"
+              className="h-5 w-auto object-contain"
+            />
+          </a>
               </div>
-              <span className="font-bold text-sm text-gray-900 tracking-tight">Intake</span>
+              <span className="font-bold text-lg text-gray-900 tracking-tight">intake</span>
             </button>
             <TooltipProvider delayDuration={0}>
               <Tooltip>

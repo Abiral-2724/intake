@@ -18,7 +18,7 @@ import {
 import {
   Plus, MoreHorizontal, Folder, FileText, Users, Trash2,
   ChevronRight, ArrowRight, Sparkles, Zap, BarChart2, Globe,
-  Layout, TrendingUp, Star,
+  Layout, TrendingUp,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -146,38 +146,33 @@ export default function Dashboard() {
           <Navbar />
           <main className="flex-1 px-7 py-7 max-w-6xl mx-auto w-full">
             {workspaces.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-[calc(100vh-9rem)]">
-                {/* Hero welcome card */}
-                <div className="w-full max-w-2xl bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden mb-5">
-                  <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 px-10 pt-10 pb-0 flex items-end gap-6">
-                    <div className="flex-1 pb-8">
-                      <div className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
-                        <Sparkles className="w-3 h-3" /> AI-powered form builder
-                      </div>
-                      <h2 className="text-3xl font-bold text-white mb-2 leading-tight">Welcome to Intake,<br /><span className="capitalize">{firstName}</span> 👋</h2>
-                      <p className="text-blue-100 text-sm mb-6 leading-relaxed">Create beautiful forms, collect responses, and analyse results — powered by Gemini AI.</p>
-                      <Button onClick={() => setShowCreate(true)} className="bg-white text-blue-700 hover:bg-blue-50 font-semibold gap-2 h-10 px-5">
-                        <Plus className="w-4 h-4" /> Create first workspace
-                      </Button>
-                    </div>
-                    <div className="hidden sm:block w-36 shrink-0">
-                      <img src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1767381121/roll-sleeves_cxhlln.png" alt="" className="w-full h-auto" />
+              <div className="min-h-[calc(100vh-9rem)] bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-8 relative overflow-hidden rounded-3xl">
+                <div className="max-w-4xl mx-auto text-center relative z-10">
+                  <div className="mb-6 relative">
+                    <img
+                      src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1766943528/roll-up-sleeves_qv5yko.png"
+                      alt="Ready to build"
+                      className="w-64 h-auto mx-auto"
+                    />
+                  </div>
+                  <div>
+                  <h1 className="text-5xl font-bold text-gray-900 mb-4">Build your first form in seconds</h1>
+                    <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
+                      {greeting}, <span className="capitalize font-semibold text-gray-800">{firstName}</span>! Start by creating a workspace —
+                      then build unlimited forms, collect responses, and analyse results with AI.
+                    </p>
+                    <button
+                      onClick={() => setShowCreate(true)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl inline-flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                      <Plus className="w-5 h-5" /> Create your first workspace
+                    </button>
+                    <div className="flex flex-wrap gap-2 justify-center mt-8">
+                      {["AI form generation", "Notion & Sheets sync", "Smart analytics", "Multi-page forms", "Auto-translate", "Response analyser"].map(f => (
+                        <span key={f} className="bg-white border border-gray-200 text-gray-500 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">✓ {f}</span>
+                      ))}
                     </div>
                   </div>
-                </div>
-                <div className="flex flex-wrap gap-2 justify-center mb-6">
-                  {["AI form generation","Notion & Sheets sync","Smart analytics","Multi-page forms","Auto-translate","Response analyser"].map(f=>(
-                    <span key={f} className="bg-white border border-gray-200 text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">✓ {f}</span>
-                  ))}
-                </div>
-                <div className="grid grid-cols-3 gap-3 w-full max-w-lg">
-                  {[{icon:Layout,l:"Templates",d:"Start from a template",h:"/templates"},{icon:Star,l:"What's new",d:"Latest features",h:"/whats-new"},{icon:TrendingUp,l:"Roadmap",d:"See what's coming",h:"/roadmap"}].map(q=>(
-                    <button key={q.l} onClick={()=>router.push(q.h)} className="bg-white border border-gray-200 rounded-2xl p-4 text-left hover:border-gray-300 hover:shadow-sm transition-all group">
-                      <q.icon className="w-4 h-4 text-gray-400 group-hover:text-blue-500 mb-2 transition-colors" />
-                      <p className="text-xs font-semibold text-gray-900">{q.l}</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{q.d}</p>
-                    </button>
-                  ))}
                 </div>
               </div>
             ) : (
