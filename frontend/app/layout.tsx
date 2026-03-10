@@ -22,11 +22,7 @@ export const metadata: Metadata = {
     title: "intake",
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/icon1.png", type: "image/png" },
-      { url: "/icon0.svg", type: "image/svg+xml" }
-    ],
+    icon: "/favicon.ico",
     apple: "/apple-icon.png",
   },
 
@@ -46,7 +42,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
+        <head>
+    <meta name="apple-mobile-web-app-title" content="intake" />
+  </head>
         <GlobalProviders>
          {children}
        </GlobalProviders>
