@@ -100,11 +100,11 @@ export default function IntakeLandingPage() {
                 intake
               </text>
             </svg>
-            <img
+            {/* <img
               src="https://res.cloudinary.com/dci6nuwrm/image/upload/v1766659954/favicon_wghbca.svg"
               alt=""
               className="w-2.5 h-2.5 mt-3 ml-[-74px]"
-            />
+            /> */}
           </h1>
         </div>
         <div className="flex items-center gap-8">

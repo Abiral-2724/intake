@@ -6,15 +6,15 @@ import Navbar from "@/components/Navbar";
 import { ArrowLeft, FileText } from "lucide-react";
 
 const SECTIONS = [
-  { title: "1. Acceptance of terms", content: `By creating an account or using Intake in any way, you agree to be bound by these Terms of Use. If you do not agree to these terms, you may not use the service.
+  { title: "1. Acceptance of terms", content: `By creating an account or using intake in any way, you agree to be bound by these Terms of Use. If you do not agree to these terms, you may not use the service.
 
-These terms apply to all users of Intake, including form creators (owners, editors) and form respondents. We reserve the right to update these terms at any time. Material changes will be communicated via email or in-app notification.` },
+These terms apply to all users of intake, including form creators (owners, editors) and form respondents. We reserve the right to update these terms at any time. Material changes will be communicated via email or in-app notification.` },
 
-  { title: "2. Description of service", content: `Intake is a web-based form builder that allows users to create forms, collect responses, analyse data, and integrate with third-party tools. The service includes AI-powered features powered by Google Gemini.
+  { title: "2. Description of service", content: `intake is a web-based form builder that allows users to create forms, collect responses, analyse data, and integrate with third-party tools. The service includes AI-powered features powered by Google Gemini.
 
 We reserve the right to modify, suspend, or discontinue any part of the service at any time. We will provide reasonable notice for significant changes.` },
 
-  { title: "3. Account registration", content: `You must create an account to use Intake. You are responsible for:
+  { title: "3. Account registration", content: `You must create an account to use intake. You are responsible for:
 
 - Providing accurate and complete registration information
 - Maintaining the security of your account credentials
@@ -23,7 +23,7 @@ We reserve the right to modify, suspend, or discontinue any part of the service 
 
 You must be at least 13 years old to create an account. Accounts are personal and may not be shared or transferred.` },
 
-  { title: "4. Acceptable use", content: `You agree to use Intake only for lawful purposes. You may not use the service to:
+  { title: "4. Acceptable use", content: `You agree to use intake only for lawful purposes. You may not use the service to:
 
 - Collect information through deceptive means or without proper consent from respondents
 - Create forms that violate any applicable laws, including data protection laws (GDPR, CCPA, etc.)
@@ -36,7 +36,7 @@ You must be at least 13 years old to create an account. Accounts are personal an
 
 We reserve the right to suspend or terminate accounts that violate these rules without notice.` },
 
-  { title: "5. Your content", content: `You retain ownership of all forms, content, and data you create in Intake ("Your Content"). By using the service, you grant us a limited, non-exclusive, royalty-free licence to store and process Your Content solely to provide the service to you.
+  { title: "5. Your content", content: `You retain ownership of all forms, content, and data you create in intake ("Your Content"). By using the service, you grant us a limited, non-exclusive, royalty-free licence to store and process Your Content solely to provide the service to you.
 
 You are solely responsible for Your Content and the information you collect from respondents through your forms. You represent that:
 
@@ -44,7 +44,7 @@ You are solely responsible for Your Content and the information you collect from
 - Your forms comply with applicable privacy laws in your jurisdiction
 - You will maintain an appropriate privacy policy for respondents if required by law` },
 
-  { title: "6. Respondent data and privacy", content: `As a form creator, you act as the data controller for information submitted through your forms. Intake acts as a data processor on your behalf.
+  { title: "6. Respondent data and privacy", content: `As a form creator, you act as the data controller for information submitted through your forms. intake acts as a data processor on your behalf.
 
 You are responsible for:
 - Informing respondents about how their data will be used
@@ -54,7 +54,7 @@ You are responsible for:
 
 We will assist with respondent requests to the extent technically possible when contacted at privacy@intake.io.` },
 
-  { title: "7. AI features", content: `Intake's AI features (form generation, response analysis, translation, block suggestions) are powered by Google Gemini. By using these features:
+  { title: "7. AI features", content: `intake's AI features (form generation, response analysis, translation, block suggestions) are powered by Google Gemini. By using these features:
 
 - You accept Google's Gemini API usage policies
 - You understand that your prompts and relevant data are sent to Google's API to generate responses
@@ -63,24 +63,24 @@ We will assist with respondent requests to the extent technically possible when 
 
 AI-generated outputs may contain errors. We make no guarantees about accuracy.` },
 
-  { title: "8. Integrations", content: `Intake allows connection to third-party services including Notion and Google Sheets. When you connect an integration:
+  { title: "8. Integrations", content: `intake allows connection to third-party services including Notion and Google Sheets. When you connect an integration:
 
-- You authorise Intake to access and write data to the connected service on your behalf
+- You authorise intake to access and write data to the connected service on your behalf
 - The third-party service's own terms and privacy policies apply
 - You are responsible for ensuring your use of the integration complies with applicable laws
 - We are not responsible for outages, errors, or data loss caused by third-party services
 
 You may disconnect integrations at any time from the Integrations panel in your form's Responses page.` },
 
-  { title: "9. Intellectual property", content: `Intake and all associated software, designs, trademarks, and content are owned by or licensed to us. Nothing in these terms grants you any right to use our name, logo, or branding.
+  { title: "9. Intellectual property", content: `intake and all associated software, designs, trademarks, and content are owned by or licensed to us. Nothing in these terms grants you any right to use our name, logo, or branding.
 
-You may not copy, modify, distribute, sell, or reverse-engineer any part of the Intake service without our written permission, except as permitted by applicable law.` },
+You may not copy, modify, distribute, sell, or reverse-engineer any part of the intake service without our written permission, except as permitted by applicable law.` },
 
-  { title: "10. Disclaimer of warranties", content: `Intake is provided "as is" and "as available" without warranties of any kind, express or implied. We do not warrant that the service will be uninterrupted, error-free, or free of harmful components.
+  { title: "10. Disclaimer of warranties", content: `intake is provided "as is" and "as available" without warranties of any kind, express or implied. We do not warrant that the service will be uninterrupted, error-free, or free of harmful components.
 
 To the maximum extent permitted by law, we disclaim all implied warranties including merchantability, fitness for a particular purpose, and non-infringement.` },
 
-  { title: "11. Limitation of liability", content: `To the maximum extent permitted by law, Intake shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of data, revenue, or profits, arising from your use of or inability to use the service.
+  { title: "11. Limitation of liability", content: `To the maximum extent permitted by law, intake shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of data, revenue, or profits, arising from your use of or inability to use the service.
 
 Our total liability for any claim shall not exceed the amount you paid us in the 12 months preceding the claim, or £100, whichever is greater.` },
 
@@ -125,7 +125,7 @@ export default function TermsPage() {
             </div>
 
             <p className="text-sm text-gray-500 mb-8 mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-              Please read these Terms of Use carefully before using Intake. By accessing or using the service, you agree to be bound by these terms. These terms constitute a legal agreement between you and Intake.
+              Please read these Terms of Use carefully before using intake. By accessing or using the service, you agree to be bound by these terms. These terms constitute a legal agreement between you and intake.
             </p>
 
             <div className="space-y-4">
@@ -138,7 +138,7 @@ export default function TermsPage() {
             </div>
 
             <p className="text-center text-xs text-gray-400 mt-8">
-              © {new Date().getFullYear()} Intake. All rights reserved. · <button onClick={() => router.push("/privacy")} className="underline hover:text-gray-600">Privacy Policy</button>
+              © {new Date().getFullYear()} intake. All rights reserved. · <button onClick={() => router.push("/privacy")} className="underline hover:text-gray-600">Privacy Policy</button>
             </p>
           </main>
         </div>
