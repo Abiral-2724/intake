@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "intake",
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/icon.ico",
     apple: "/apple-icon.png",
   },
 
