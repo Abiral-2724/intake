@@ -33,6 +33,7 @@ export const getWorkspaces = async (req , res , next ) => {
           ownerId: userId,
           members: { create: { userId, role: "OWNER" } },
         },
+          include: { _count: { select: { forms: true, members: true } } },
       });
   
       res.status(201).json({ success: true, data: workspace });
